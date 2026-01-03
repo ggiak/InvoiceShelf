@@ -20,8 +20,14 @@ class SendInvoiceController extends Controller
 
         $invoice->send($request->all());
 
+        $emailLog = \App\Models\EmailLog::where('mailable_type', Invoice::class)
+            ->where('mailable_id', $invoice->id)
+            ->latest()
+            ->first();
+
         return response()->json([
             'success' => true,
+            'public_url' => $emailLog ? route('invoice', ['email_log' => $emailLog->token]) : null,
         ]);
     }
 }
